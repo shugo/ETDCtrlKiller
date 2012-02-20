@@ -75,7 +75,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 //
 //    この関数および使い方は、'RegisterClassEx' 関数が追加された
 //    Windows 95 より前の Win32 システムと互換させる場合にのみ必要です。
-//    アプリケーションが、関連付けられた
+//    アプリケーションが、関連付けられた	
 //    正しい形式の小さいアイコンを取得できるようにするには、
 //    この関数を呼び出してください。
 //
@@ -170,9 +170,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
+	static UINT s_uTaskbarRestart;
 
 	switch (message)
 	{
+	case WM_CREATE:
+		s_uTaskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
+		break;
 	case WM_COMMAND:
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
@@ -214,6 +218,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	default:
+		if (message == s_uTaskbarRestart) {
+			InitNotifyIcon(hWnd);
+		}
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
