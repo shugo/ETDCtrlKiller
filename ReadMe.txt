@@ -2,7 +2,7 @@
 ETDCtrlKiller
 =============
 
-ETDCtrl.exe is software to control touchpads, and sometimes remained at 25%
+ETDCtrl.exe is software to control touchpads, and sometimes remains at 25%
 CPU usage.  If ETDCtrl.exe is disabled, the CPU consumption can be decreased,
 but the touchpad settings will be reverted to default values when resumed from
 sleep.
