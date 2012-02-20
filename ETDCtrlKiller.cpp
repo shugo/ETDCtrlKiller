@@ -7,16 +7,20 @@
 HINSTANCE hInst;
 TCHAR szTitle[MAX_LOADSTRING];
 TCHAR szWindowClass[MAX_LOADSTRING];
-TCHAR szETDCtrlPath[] = _T("C:\\Program Files\\Elantech\\ETDCtrl.exe");
+TCHAR szETDCtrlPath[1024];
+DWORD dwShowMessage = 1;
 HANDLE hETDCtrl = INVALID_HANDLE_VALUE;
 UINT_PTR nStopETDCtrlTimer = 1;
 UINT uETDCtrlLifeTime = 60 * 1000;
 
+void				LoadPreferences();
+void				SavePreferences();
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 BOOL				InitNotifyIcon(HWND);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	Preferences(HWND, UINT, WPARAM, LPARAM);
 void				StartETDCtrl(HWND);
 void				StopETDCtrl(HWND);
 void				ShowMenu(HWND);
@@ -32,6 +36,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	MSG msg;
 	HACCEL hAccelTable;
+
+	LoadPreferences();
 
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_ETDCTRLKILLER, szWindowClass, MAX_LOADSTRING);
@@ -56,7 +62,41 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	return (int) msg.wParam;
 }
 
+void LoadPreferences()
+{
+	HKEY hKey;
+	DWORD dwType = REG_SZ;
+	DWORD dwLen = sizeof(szETDCtrlPath);
 
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, _T("Software\\shugo\\ETDCtrlKiller"),
+			0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) {
+		return;
+	}
+	if (RegQueryValueEx(hKey, _T("ETDCtrlPath"), NULL, &dwType, (LPBYTE) szETDCtrlPath, &dwLen)
+		!= ERROR_SUCCESS) {
+		lstrcpy(szETDCtrlPath, _T("C:\\Program Files\\Elantech\\ETDCtrl.exe"));
+	}
+	dwType = REG_DWORD;
+	dwLen = sizeof(dwShowMessage);
+	if (RegQueryValueEx(hKey, _T("ShowMessage"), NULL, &dwType, (LPBYTE) &dwShowMessage, &dwLen)
+		!= ERROR_SUCCESS) {
+		dwShowMessage = 1;
+	}
+	RegCloseKey(hKey);
+}
+
+void SavePreferences()
+{
+	HKEY hKey;
+
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, _T("Software\\shugo\\ETDCtrlKiller"),
+			0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) {
+		return;
+	}
+	RegSetValueEx(hKey, _T("ETDCtrlPath"), 0, REG_SZ, (CONST BYTE *) szETDCtrlPath, (lstrlen(szETDCtrlPath) + 1) * sizeof(TCHAR));
+	RegSetValueEx(hKey, _T("ShowMessage"), 0, REG_DWORD, (CONST BYTE *) &dwShowMessage, sizeof(dwShowMessage));
+	RegCloseKey(hKey);
+}
 
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
@@ -148,6 +188,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
+		case IDM_PREFERENCES:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_PREFERENCES), hWnd, Preferences);
+			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
@@ -179,8 +222,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_NOTIFYICON:
-		if (lParam == WM_LBUTTONDOWN || lParam == WM_RBUTTONDOWN) {
+		switch (lParam) {
+		case WM_LBUTTONDOWN:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_PREFERENCES), hWnd, Preferences);
+			break;
+		case WM_RBUTTONDOWN:
 			ShowMenu(hWnd);
+			break;
 		}
 		break;
 	default:
@@ -203,6 +251,32 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
 		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK Preferences(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		SetDlgItemText(hDlg, IDC_PATHEDIT, szETDCtrlPath);
+		CheckDlgButton(hDlg, IDC_SHOWMSGCHECKBOX, dwShowMessage ? BST_CHECKED : BST_UNCHECKED);
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			if (LOWORD(wParam) == IDOK) {
+				GetDlgItemText(hDlg, IDC_PATHEDIT, szETDCtrlPath, sizeof(szETDCtrlPath) / sizeof(TCHAR));
+				dwShowMessage = IsDlgButtonChecked(hDlg, IDC_SHOWMSGCHECKBOX) == BST_CHECKED;
+				SavePreferences();
+			}
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
 		}
@@ -260,6 +334,7 @@ void ShowMessage(HWND hWnd, LPCTSTR message)
 {
 	NOTIFYICONDATA nid;
 
+	if (!dwShowMessage) return;
 	ZeroMemory(&nid, sizeof(nid));
 	nid.cbSize = sizeof(nid);
 	nid.hWnd = hWnd;
