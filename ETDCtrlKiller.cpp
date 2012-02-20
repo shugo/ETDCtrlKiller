@@ -269,3 +269,5 @@ void ShowMessage(HWND hWnd, LPCTSTR message)
 	lstrcpy(nid.szInfo, message);
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
+
+// vim: set sw=4 ts=4 noexpandtab :
