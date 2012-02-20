@@ -1,69 +1,24 @@
-﻿========================================================================
-    Win32 アプリケーション: ETDCtrlKiller プロジェクトの概要
-========================================================================
+﻿=============
+ETDCtrlKiller
+=============
 
-この ETDCtrlKiller アプリケーションは、AppWizard により作成されました。
+ETDCtrl.exe is software to control touchpads, and sometimes remained at 25%
+CPU usage.  If ETDCtrl.exe is disabled, the CPU consumption can be decreased,
+but the touchpad settings will be reverted to default values when resumed from
+sleep.
 
-このファイルには、ETDCtrlKiller 
-アプリケーションを構成する各ファイルの内容の概要が含まれています。
+ETDCtrlKiller is a tool to automatically start ETDCtrl.exe and terminate it
+one minute later so that it doesn't spend CPU.
 
+Installation
+------------
 
-ETDCtrlKiller.vcxproj
-    これは、アプリケーション ウィザードを使用して生成された VC++ 
-    プロジェクトのメイン プロジェクト ファイルです。
-    ファイルを生成した Visual C++ のバージョンに関する情報と、アプリケーション 
-    ウィザードで選択されたプラットフォーム、
-    構成、およびプロジェクト機能に関する情報が含まれています。
+(1) Disable ETDCtrl.exe using msconfig.
+(2) Put ETDCtrlKiller.exe into the Startup folder.
+(3) Reboot the computer.
 
-ETDCtrlKiller.vcxproj.filters
-    これは、アプリケーション ウィザードで生成された VC++ プロジェクトのフィルター 
-    ファイルです。 
-    このファイルには、プロジェクト内のファイルとフィルターとの間の関連付けに関する
-    情報が含まれています。 この関連付けは、特定のノー
-    ドで同様の拡張子を持つファイルのグループ化を
-    示すために IDE で使用されます (たとえば、".cpp" ファイルは "ソース ファイル" 
-    フィルターに関連付けられています)。
+Usage
+-----
 
-ETDCtrlKiller.cpp
-    これは、メインのアプリケーション ソース ファイルです。
-
-/////////////////////////////////////////////////////////////////////////////
-AppWizard によって、次のリソースが作成されました。
-
-ETDCtrlKiller.rc
-    これは、プログラムが使用するすべての Microsoft Windows リソースの一覧です。RES 
-    サブディレクトリに格納されるアイコン、ビットマップ、
-    およびカーソルをインクルードしています。  このファイルは、Microsoft Visual C++ 
-    で直接編集できます。
-
-Resource.h
-    これは、新しいリソース ID を定義する標準のヘッダー ファイルです。
-    このファイルの読み込みおよび更新は、Microsoft Visual C++ で行います。
-
-ETDCtrlKiller.ico
-    これは、アプリケーションのアイコン (32x32) として使用されるアイコン 
-    ファイルです。
-    このアイコンは、メイン リソース ファイル ETDCtrlKiller.rc 
-    にインクルードされます。
-
-small.ico
-    これは、アプリケーションのアイコンの小さいバージョン (16x16) を含むアイコン 
-    ファイルです。 このアイコンは、メイン リソース ファイル ETDCtrlKiller.rc 
-    にインクルードされます。
-
-/////////////////////////////////////////////////////////////////////////////
-その他の標準ファイル :
-
-StdAfx.h、StdAfx.cpp
-    これらのファイルは、ETDCtrlKiller.pch 
-    という名前のプリコンパイル済みヘッダー (PCH) ファイルと、StdAfx.obj 
-    という名前のプリコンパイル済みの型ファイルを構築するために使用されます。
-
-/////////////////////////////////////////////////////////////////////////////
-その他のメモ :
-
-AppWizard では "TODO:" 
-コメントを使用して、ユーザーが追加またはカスタマイズする必要のあるソース 
-コードを示します。
-
-/////////////////////////////////////////////////////////////////////////////
+You can find ETDCtrlKiller's icon in the task tray.  Show the popup menu by
+right click to configure ETDCtrlKiller or exit.
