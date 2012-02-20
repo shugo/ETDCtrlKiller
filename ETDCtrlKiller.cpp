@@ -20,6 +20,7 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 void				StartETDCtrl(HWND);
 void				StopETDCtrl(HWND);
 void				ShowMenu(HWND);
+void				ShowMessage(HWND, LPCTSTR);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -107,13 +108,14 @@ BOOL InitNotifyIcon(HWND hWnd)
 {
 	NOTIFYICONDATA nid;
 
-	nid.cbSize = sizeof(NOTIFYICONDATA);
+	ZeroMemory(&nid, sizeof(nid));
+	nid.cbSize = sizeof(nid);
 	nid.hWnd = hWnd;
 	nid.uID = 0;
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	nid.uCallbackMessage = WM_NOTIFYICON;
 	nid.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_SMALL));
-	lstrcpy(nid.szTip, _T("ETDCtrl Killer"));
+	lstrcpy(nid.szTip, _T("ETDCtrlKiller"));
 	for (int i = 0; i < 18; i++) {
 		if (Shell_NotifyIcon(NIM_ADD, &nid)) return TRUE;
 		if (GetLastError() != ERROR_TIMEOUT) return FALSE;
@@ -155,8 +157,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
-		StopETDCtrl(hWnd);
-		PostQuitMessage(0);
+		{
+			NOTIFYICONDATA nid;
+
+			StopETDCtrl(hWnd);
+			ZeroMemory(&nid, sizeof(nid));
+			nid.cbSize = sizeof(nid);
+			nid.hWnd = hWnd;
+			Shell_NotifyIcon(NIM_DELETE, &nid);
+			PostQuitMessage(0);
+		}
 		break;
 	case WM_POWERBROADCAST:
 		if (wParam == PBT_APMRESUMEAUTOMATIC) {
@@ -217,6 +227,7 @@ void StartETDCtrl(HWND hWnd)
 		}
 		CloseHandle(pi.hThread);
 		hETDCtrl = pi.hProcess;
+		ShowMessage(hWnd, _T("Started ETDCtrl.exe"));
 	}
 	SetTimer(hWnd, nStopETDCtrlTimer, uETDCtrlLifeTime, NULL);
 }
@@ -228,6 +239,7 @@ void StopETDCtrl(HWND hWnd)
 		TerminateProcess(hETDCtrl, 0);
 		CloseHandle(hETDCtrl);
 		hETDCtrl = INVALID_HANDLE_VALUE;
+		ShowMessage(hWnd, _T("Terminated ETDCtrl.exe"));
 	}
 }
 
@@ -242,4 +254,18 @@ void ShowMenu(HWND hWnd)
     SetForegroundWindow(hWnd);
     TrackPopupMenu(hSubMenu, TPM_BOTTOMALIGN, pt.x, pt.y, 0, hWnd, NULL);
     DestroyMenu(hMenu);
+}
+
+void ShowMessage(HWND hWnd, LPCTSTR message)
+{
+	NOTIFYICONDATA nid;
+
+	ZeroMemory(&nid, sizeof(nid));
+	nid.cbSize = sizeof(nid);
+	nid.hWnd = hWnd;
+	nid.uFlags = NIF_INFO;
+	nid.dwInfoFlags = NIIF_INFO;
+	lstrcpy(nid.szInfoTitle, _T("ETDCtrlKiller"));
+	lstrcpy(nid.szInfo, message);
+	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
