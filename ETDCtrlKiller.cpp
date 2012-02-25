@@ -191,6 +191,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_PREFERENCES:
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_PREFERENCES), hWnd, Preferences);
 			break;
+		case IDM_STARTETDCTRL:
+			if (hETDCtrl == INVALID_HANDLE_VALUE) {
+				StartETDCtrl(hWnd);
+			}
+			else {
+				MessageBox(NULL, _T("ETDCtrl.exe is already running"), _T("Error"), MB_OK);
+			}
+			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}

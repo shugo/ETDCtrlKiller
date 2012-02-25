@@ -10,10 +10,11 @@
 #define IDD_ABOUTBOX			103
 #define IDM_ABOUT				104
 #define IDM_EXIT				105
-#define IDM_PREFERENCES				106
-#define IDI_ETDCTRLKILLER			107
-#define IDI_SMALL				108
-#define IDC_ETDCTRLKILLER			109
+#define IDM_PREFERENCES			106
+#define IDM_STARTETDCTRL		107
+#define IDI_ETDCTRLKILLER		111
+#define IDI_SMALL				112
+#define IDC_ETDCTRLKILLER		113
 #define IDC_MYICON				2
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
