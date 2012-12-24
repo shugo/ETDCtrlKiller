@@ -227,6 +227,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		if (wParam == nStopETDCtrlTimer) {
 			StopETDCtrl(hWnd);
+			StartETDCtrl(hWnd);
 		}
 		break;
 	case WM_NOTIFYICON:
